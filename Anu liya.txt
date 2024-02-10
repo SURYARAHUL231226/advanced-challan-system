@@ -1,0 +1,39 @@
+pip install opencv-python
+pip install RPi.GPIO  # Only required if you are using a Raspberry Pi GPIO sensor
+import cv2
+import RPi.GPIO as GPIO  # Import GPIO library for Raspberry Pi (replace with your sensor library)
+
+# GPIO setup
+SENSOR_PIN = 18  # Replace with the actual GPIO pin your sensor is connected to
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(SENSOR_PIN, GPIO.IN)
+
+# Camera setup
+camera = cv2.VideoCapture(0)  # 0 represents the default camera, change if needed
+if not camera.isOpened():
+    print("Error: Could not open camera.")
+    exit()
+
+try:
+    while True:
+        # Check sensor state
+        if GPIO.input(SENSOR_PIN) == GPIO.HIGH:  # Replace with the appropriate condition for your sensor
+            # Capture image from the camera
+            ret, frame = camera.read()
+
+            if ret:
+                # Save or process the captured frame
+                cv2.imwrite("captured_image.jpg", frame)
+                print("Image captured!")
+
+        # Adjust the delay based on your application requirements
+        cv2.waitKey(1000)
+
+except KeyboardInterrupt:
+    # Handle keyboard interrupt (e.g., Ctrl+C) to stop the program gracefully
+    pass
+
+finally:
+    # Release the camera and cleanup GPIO
+    camera.release()
+    GPIO.cleanup()
